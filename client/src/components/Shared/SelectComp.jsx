@@ -1,7 +1,22 @@
+import {useState,useEffect} from 'react';
 import { FormControl,Select,MenuItem,OutlinedInput } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
-const SelectComp=()=>{
-return <FormControl sx={{width:200}}>
+
+
+function getStyles(theme) {
+    return {
+      fontWeight:theme.typography.fontWeightMedium,
+      fontSize:"1.2rem"
+    };
+  }
+const SelectComp=({vaccines=[],selectedVaccine,handleSelect})=>{
+    const theme = useTheme();
+    const [vaccinesList,setVaccinesList]=useState([])
+    useEffect(()=>{
+      setVaccinesList(vaccines)
+    },[vaccines])
+   return <FormControl sx={{width:200}}>
        <label id="demo-simple-select-label" style={{fontSize:"1.2rem", marginBottom:"0.3em",color:"#002352"}} >Select Vaccine</label>
          <Select 
          displayEmpty
@@ -11,14 +26,15 @@ return <FormControl sx={{width:200}}>
              sx={{fontSize:"1.2rem"}}
              input={<OutlinedInput />}
              label="Age"
-             onChange={(e)=>handleSelect(e)}
+             onChange={(e)=>handleSelect(e.target.value)}
              
          >
-           {vaccines &&vaccines.map(vac=>(
-               <MenuItem style={getStyles(vac,theme)}
+           {vaccinesList && vaccinesList?.map(vac=>(
+               <MenuItem style={getStyles(theme)}
                value={vac.id}>{vac.name}</MenuItem>
            ))} 
             
        </Select>
        </FormControl>
 }
+export default SelectComp;
