@@ -2,10 +2,37 @@ import React, { useReducer, useCallback, useEffect } from "react";
 import Web3 from "web3";
 import EthContext from "./EthContext";
 import { reducer, actions, initialState } from "./state";
+import { ToastContainer,toast} from 'react-toastify';
 
 function EthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const listenToTheVaccineEvent=(contract)=>{
+    console.log(contract)
+    contract?.events?.VaccineChainStep().on("data",async(evt)=>{
+      if(evt.returnValues){
+        console.log(evt)
+        switch(evt.returnValues.step){
+          case "0":
+            return toast.success("Not ready for Delivery");
+          case "1":
+            return toast.success("Container created and ready for delivery");
+          case "2":
+            return toast.success("Container is on its track"); 
+          case "3":
+            return toast.success("Delivery of container has been ended"); 
+          case "4":
+              return toast.success("Container has been received");  
+                 
+          default:
+            return toast.error("Something went wrong")   
 
+        }
+      //  alert(evt)
+       
+      }
+      
+    })
+  }
   const init = useCallback(
     async artifact => {
       if (artifact) {
@@ -25,10 +52,12 @@ function EthProvider({ children }) {
             const res=await contract?.methods?.vaccine(i)?.call({from:accounts[0]})
             vaccines.push({id:res.id,name:res.name})
           }
-console.log(vaccines,vaccineCount)
+          console.log(vaccines,vaccineCount)
         } catch (err) {
           console.error(err);
         }
+        listenToTheVaccineEvent(contract);
+
         dispatch({
           type: actions.init,
           data: { artifact, web3, accounts, networkID, contract,vaccines }
@@ -53,6 +82,8 @@ console.log(vaccines,vaccineCount)
     const events = ["chainChanged", "accountsChanged"];
     const handleChange = () => {
       init(state.artifact);
+      console.log("changes")
+      window.location.reload();
     };
 
     events.forEach(e => window.ethereum.on(e, handleChange));
@@ -66,6 +97,7 @@ console.log(vaccines,vaccineCount)
       state,
       dispatch
     }}>
+      <ToastContainer />
       {children}
     </EthContext.Provider>
   );

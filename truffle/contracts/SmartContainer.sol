@@ -80,7 +80,7 @@ contract Container is VaccinationCenter{
         violationType v;
     }
    mapping(uint=>Vaccines)public  vaccine;
-   uint vaccineCount;
+   uint public vaccineCount;
    mapping(uint=> bool) public containersCreated;
  
     constructor() public{

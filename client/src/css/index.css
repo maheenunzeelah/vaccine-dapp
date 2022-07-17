@@ -1,0 +1,31 @@
+.root{
+    position: relative; 
+    /* height: 100vh;
+    width: 100%;*/
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+       /* position: "fixed";
+       top: 0;
+       left: 0;
+       right: 0; 
+       bottom: 0;*/
+       width: 100%!important;
+       height: 100vh!important;
+       background-repeat: no-repeat;
+       /* background-color: 'transparent';
+       display: "flex";
+       justify-content: "flex-start";
+       align-items: 'flex-start'; */
+}
+.root::before {    
+    content: "";
+    background-image: url('../assets/covid2.jpg');
+    background-size: cover;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    opacity: 0.6;
+}

@@ -4,6 +4,7 @@ import Manufacturer from "./Screens/Manufacturer";
 import Distributor from "./Screens/Distributor";
 import { Route, Routes, Redirect, withRouter } from 'react-router-dom';
 import "./App.css";
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -11,8 +12,9 @@ function App() {
       <div >
         <div >
         <Routes>
-        <Route exact path='/'element={<Manufacturer/>} />
-        <Route exact path='/distributor' element={<Distributor />} />
+        <Route exact path='/'element={<Home/>} />
+        <Route exact path='/manufacturer'element={<Manufacturer/>} />
+        <Route path='/distributor' element={<Distributor />} />
         {/* <Route exact path='/dashboard' component={Dashboard} /> */}
         {/* <Route exact path='/manufacturer' component={Manufacturer} />
         

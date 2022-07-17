@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Stack} from '@mui/material';
 import useEth from "../../contexts/EthContext/useEth";
 import {ButtonComp,RootContainer,SelectComp,TextInpComp} from '../../components/Shared';
+import { useNavigate } from "react-router-dom";
 
 const Manufacturer=()=>{
     const { state: { accounts,contract,vaccines} } = useEth();  
     const [selectedVaccine,setSelectedVaccine]=useState(0);
-  const [distributor,setDistributor]=useState('');
+    const [distributor,setDistributor]=useState('');
+    const navigate=useNavigate();
     const handleSelect=(val)=>{
         setSelectedVaccine(val)
     }
