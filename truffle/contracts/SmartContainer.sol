@@ -2,7 +2,7 @@ pragma solidity >=0.4.20;
 
 contract Manufacturer{
     address public manufacturer;
-     constructor() {
+     constructor() public {
         manufacturer=msg.sender;
     }
     modifier onlyManufacturer(){
@@ -20,7 +20,9 @@ contract Distributor is Manufacturer{
      function distributorRegistration (address user) public onlyManufacturer { //manufacturer adds only authorized distributors
        distributor[user]=true;
     } 
-   
+    //  constructor(address _user) public {
+    //     _distributor[msg.se]=_user;
+    // }
     modifier onlyDistributor () {
       require(isDistributor(), "Only registered distributor can perform this action");
       _;
@@ -31,6 +33,8 @@ contract Distributor is Manufacturer{
 
 }
 contract VaccinationCenter is Distributor{
+    address public vaccination_center;
+    
  modifier onlyVaccinationCenter() {
         require(isVaccinationCenter(),"Only Vaccination center can perform this action");
         _;
@@ -51,10 +55,7 @@ contract Container is VaccinationCenter{
 }
  contract SmartContainer is Container{
     address public container;
-    // address public manufacturer;
-    address public vaccination_center; // only authorized vaccination center is allowed
-    // mapping(address => bool) public distributor; // only authorized distributors are allowed
-    enum containerStatus {NotReady, ReadyforDelivery, StartDelivery, onTrack, EndDelivery, ContainerReceived, Violated}
+    enum containerStatus {NotReady, ReadyforDelivery, onTrack, EndDelivery, ContainerReceived, Violated}
     // containerStatus public state;
     uint startTime;
     enum violationType { None, Temp, Open, Light, Route}
@@ -65,18 +66,12 @@ contract Container is VaccinationCenter{
     int light;
 
         //Tracking Events
-    event ContainerOwnership (address previousowner, address newowner); // Manufacturer announces container is created
-    event ContainerReadyForDelivery(uint256 id, address indexed manufacturer); //Manufacturer announces container is ready for delivery
-    event DeliveryStart(uint256 id, address indexed distributor); //Distributor announces that start of the delivery process
-    event DeliveryEnd(uint256 id, address indexed distributor); // Distributor announces the end of the delivery
-    event ContainerReception(uint256 id, address indexed vaccination_center); 
-    
+    event ContainerOwnership (uint id,address previousowner, address newowner); // Manufacturer announces container is created
+
+     event VaccineChainStep(uint id, uint step, address indexed owner );
     //Violations Events
-    event TemperatureViolation( int v); 
-    event ContainerOpening( int v);
-    event OffTrack( int v);
-    event LightViolation ( int v);
-    event ErrorNoValidViolation();
+    event ViolationEvent(uint id, uint8 vio_type, int val);
+  
 
     struct Vaccines {
         uint id;
@@ -85,16 +80,15 @@ contract Container is VaccinationCenter{
         violationType v;
     }
    mapping(uint=>Vaccines)public  vaccine;
-   uint public vaccineCount;
+   uint vaccineCount;
    mapping(uint=> bool) public containersCreated;
  
-    constructor() {
+    constructor() public{
       manufacturer = msg.sender;
       startTime = block.timestamp;
       addVaccines("Pfizer");
       addVaccines("Sinovac");
     //   state = containerStatus.NotReady;
-      emit ContainerOwnership(address(0), manufacturer);
     }
       function addVaccines(string memory _name) internal {
         vaccine[vaccineCount] = Vaccines(
@@ -103,6 +97,8 @@ contract Container is VaccinationCenter{
             containerStatus.NotReady,
             violationType.None
         );
+      emit ContainerOwnership(vaccineCount,address(0), manufacturer);
+
         vaccineCount++;
     }
     // View Container manufacturer
@@ -120,7 +116,7 @@ contract Container is VaccinationCenter{
 
         vaccine[vacc_id].state = containerStatus.ReadyforDelivery;
 
-        emit ContainerReadyForDelivery(vacc_id, msg.sender);
+        emit VaccineChainStep(vacc_id,uint(vaccine[vacc_id].state),msg.sender);
 
         containersCreated[vacc_id] = true;
         // return vaccine[vacc_id].state;
@@ -136,7 +132,8 @@ contract Container is VaccinationCenter{
             "Can't start delivery before creating the container"
         );
         vaccine[vacc_id].state = containerStatus.onTrack;
-        emit DeliveryStart(vacc_id, msg.sender);
+        emit VaccineChainStep(vacc_id,uint(vaccine[vacc_id].state),msg.sender);
+
         
     }
 
@@ -149,8 +146,8 @@ contract Container is VaccinationCenter{
             "Can't end delivery before announcing the start of it"
         );
         vaccine[vacc_id].state = containerStatus.EndDelivery;
-        emit DeliveryEnd(vacc_id, msg.sender);
-        // return vaccine[vacc_id].state;
+        emit VaccineChainStep(vacc_id,uint(vaccine[vacc_id].state),msg.sender);
+
     }
    
      function ReceiveContainer(uint vacc_id) public onlyVaccinationCenter
@@ -160,33 +157,18 @@ contract Container is VaccinationCenter{
             "Can't receive the container before announcing the end of it"
         );
         vaccine[vacc_id].state = containerStatus.ContainerReceived;
-        emit ContainerReception(vacc_id, msg.sender);
+        emit VaccineChainStep(vacc_id,uint(vaccine[vacc_id].state),msg.sender);
+
         
     }
    
     //Violations Monitoring 
     
-    function violationOccurrence(violationType v, int value, uint vacc_id) public onlyContainer{
-        require(vaccine[vacc_id].state  == containerStatus.onTrack, "The container is not being delivered"); // Monitoring starts when the container is on track
+    function violationOccurrence(uint vacc_id, violationType v, int value) public onlyContainer{
+        require(vaccine[vacc_id].state  == containerStatus.onTrack, "The container delivery hasn't been started yet"); // Monitoring starts when the container is on track
         
         vaccine[vacc_id].state = containerStatus.Violated;
-        if(v == violationType.Temp){
-             
-            emit TemperatureViolation( value);
-        }
-        else if (v == violationType.Open){
-            //either 1 or 0
-            emit ContainerOpening ( value);
-        }
-        else if (v == violationType.Route){
-           
-            emit OffTrack(  value);
-        }
-        else if (v == violationType.Light){
-           
-            emit LightViolation( value);
-        }
-        else
-            emit ErrorNoValidViolation();
-    }
+        emit ViolationEvent(vacc_id,uint8(v),value);
+ 
 }
+ }
