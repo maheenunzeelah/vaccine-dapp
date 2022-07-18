@@ -1,14 +1,19 @@
-import { useState } from 'react';
-import { Stack} from '@mui/material';
+import { useState,useEffect } from 'react';
 import useEth from "../../contexts/EthContext/useEth";
 import {ButtonComp,RootContainer,SelectComp,TextInpComp} from '../../components/Shared';
-import { useNavigate } from "react-router-dom";
 
 const Manufacturer=()=>{
     const { state: { accounts,contract,vaccines} } = useEth();  
     const [selectedVaccine,setSelectedVaccine]=useState(0);
+    const [notReadyVacc,setNotReadyVacc]=useState([]);
     const [distributor,setDistributor]=useState('');
-    const navigate=useNavigate();
+
+    useEffect(()=>{
+      const _notReady=vaccines?.filter(vacc=>(vacc.state=="0"));
+      setNotReadyVacc(_notReady);
+      setSelectedVaccine(parseInt(_notReady[0]?.id))
+    },[vaccines])
+
     const handleSelect=(val)=>{
         setSelectedVaccine(val)
     }
@@ -17,8 +22,14 @@ const Manufacturer=()=>{
     }
     const createContainer=async(e)=>{
       try{
-        const create=await contract?.methods?.CreateContainer(selectedVaccine)?.send({from:accounts[0]})
-      console.log(create)
+        const create=await contract?.methods?.CreateContainer(selectedVaccine)?.send({from:accounts[0]});
+        if(create){
+          const _notReady=vaccines?.filter(vacc=>(vacc.state=="0" && vacc.id!=selectedVaccine));
+          setNotReadyVacc(_notReady);
+          if(_notReady.length)
+          setSelectedVaccine(parseInt(_notReady[0].id))
+
+        }
       }
       catch(err){
         console.log(err)
@@ -35,13 +46,11 @@ const Manufacturer=()=>{
       }
     }
     
-    return <RootContainer heading={"Manufacturer"} address={accounts && accounts[0]}>
-            <Stack spacing={2} direction="column" mt="2em">
-              <SelectComp vaccines={vaccines} selectedVaccine={selectedVaccine} handleSelect={handleSelect} />
+    return <RootContainer heading={"Manufacturer"} selectedVaccine={selectedVaccine} address={accounts && accounts[0]}>
+              <SelectComp vaccines={notReadyVacc} selectedVaccine={selectedVaccine} handleSelect={handleSelect} />
               <ButtonComp text={'Create Container'} onClick={createContainer} />
               <TextInpComp placeholder={'Enter Distributor Address'} distributor={distributor} handleDistributor={handleDistributor}/>
               <ButtonComp text={'Register Distributor'} onClick={registerDistributor}/>
-            </Stack>
           </RootContainer>
 }
 

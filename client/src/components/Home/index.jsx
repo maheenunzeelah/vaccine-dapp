@@ -59,12 +59,16 @@ const Home=()=>{
      },
      {
       text:'Container',
-      path:'/manufacturer'
+      path:'/container'
      },
      {
       text:'Vaccine Center',
-      path:'/manufacturer'
+      path:'/vaccine_center'
      },
+     {
+      text:'Track Containers',
+      path:'/track_container'
+     }
 ]
   return  <Box className="root">
             <Box sx={styles.head}>

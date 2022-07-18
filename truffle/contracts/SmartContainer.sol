@@ -79,7 +79,7 @@ contract Container is VaccinationCenter{
         containerStatus state;
         violationType v;
     }
-   mapping(uint=>Vaccines)public  vaccine;
+   mapping(uint=>Vaccines) public  vaccine;
    uint public vaccineCount;
    mapping(uint=> bool) public containersCreated;
  
@@ -87,7 +87,12 @@ contract Container is VaccinationCenter{
       manufacturer = msg.sender;
       startTime = block.timestamp;
       addVaccines("Pfizer");
-      addVaccines("Sinovac");
+      addVaccines("Sinovac Batch1");
+      addVaccines("Sinovac Batch2");
+      addVaccines("Sinovac Batch3");
+      addVaccines("Sinovac Batch4");
+      addVaccines("Sinovac Batch5");
+
     //   state = containerStatus.NotReady;
     }
       function addVaccines(string memory _name) internal {

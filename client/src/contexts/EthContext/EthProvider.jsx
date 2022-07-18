@@ -6,6 +6,31 @@ import { ToastContainer,toast} from 'react-toastify';
 
 function EthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const listenToTheViolationEvents=(contract)=>{
+    contract?.events?.ViolationEvent().on("data",async(evt)=>{
+      if(evt.returnValues){
+        console.log(evt)
+        switch(evt.returnValues.vio_type){
+          case "1":
+            return toast.warning("Temprature of the container violated");
+          case "2":
+            return toast.warning("Container opened while on track");
+          case "3":
+            return toast.warning("Container has been exposed to light"); 
+          case "4":
+            return toast.warning("Container got sidetracked"); 
+            
+                 
+          default:
+            return toast.error("Something went wrong")   
+
+        }
+      //  alert(evt)
+       
+      }
+      
+    })
+  }
   const listenToTheVaccineEvent=(contract)=>{
     console.log(contract)
     contract?.events?.VaccineChainStep().on("data",async(evt)=>{
@@ -50,18 +75,19 @@ function EthProvider({ children }) {
          
           for(let i=0;i<vaccineCount;i++){
             const res=await contract?.methods?.vaccine(i)?.call({from:accounts[0]})
-            vaccines.push({id:res.id,name:res.name})
+            vaccines.push({id:res.id,name:res.name,state:res.state})
           }
           console.log(vaccines,vaccineCount)
         } catch (err) {
           console.error(err);
         }
-        listenToTheVaccineEvent(contract);
 
         dispatch({
           type: actions.init,
           data: { artifact, web3, accounts, networkID, contract,vaccines }
         });
+        listenToTheVaccineEvent(contract);
+        listenToTheViolationEvents(contract);
       }
     }, []);
 
@@ -77,7 +103,9 @@ function EthProvider({ children }) {
 
     tryInit();
   }, [init]);
-
+    // useEffect(()=>{
+    //   toast.success("Checking!!!")
+    //  },[])
   useEffect(() => {
     const events = ["chainChanged", "accountsChanged"];
     const handleChange = () => {
@@ -97,7 +125,7 @@ function EthProvider({ children }) {
       state,
       dispatch
     }}>
-      <ToastContainer />
+      <ToastContainer style={{ fontSize:"1.4rem" }} />
       {children}
     </EthContext.Provider>
   );

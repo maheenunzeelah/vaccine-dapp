@@ -12,11 +12,12 @@ function getStyles(theme) {
   }
 const SelectComp=({vaccines=[],selectedVaccine,handleSelect})=>{
     const theme = useTheme();
-    const [vaccinesList,setVaccinesList]=useState([])
+    const [vaccinesList,setVaccinesList]=useState([]);
+    console.log(selectedVaccine)
     useEffect(()=>{
       setVaccinesList(vaccines)
     },[vaccines])
-   return <FormControl sx={{width:200}}>
+   return <FormControl >
        <label id="demo-simple-select-label" style={{fontSize:"1.2rem", marginBottom:"0.3em",color:"#002352"}} >Select Vaccine</label>
          <Select 
          displayEmpty
@@ -29,7 +30,7 @@ const SelectComp=({vaccines=[],selectedVaccine,handleSelect})=>{
              onChange={(e)=>handleSelect(e.target.value)}
              
          >
-           {vaccinesList && vaccinesList?.map(vac=>(
+           {vaccinesList && vaccinesList?.map((vac,i)=>(
                <MenuItem style={getStyles(theme)}
                value={vac.id}>{vac.name}</MenuItem>
            ))} 
