@@ -18,11 +18,12 @@
  *
  */
 
-// require('dotenv').config();
-// const mnemonic = process.env["MNEMONIC"];
-// const infuraProjectId = process.env["INFURA_PROJECT_ID"];
-
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+require('dotenv').config();
+const mnemonic = process.env["MNEMONIC"];
+const infuraProjectId = process.env["INFURA_PROJECT_ID"];
+const ropstenProjectId = process.env["ROPSTEN_PROJECT_ID"];
+const AccountIndex=0;
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 module.exports = {
   /**
@@ -61,22 +62,31 @@ module.exports = {
     //
     // Useful for deploying to a public network.
     // Note: It's important to wrap the provider as a function to ensure truffle uses a new provider every time.
-    // goerli: {
-    //   provider: () => new HDWalletProvider(mnemonic, `https://goerli.infura.io/v3/${infuraProjectId}`),
-    //   network_id: 5,       // Goerli's network id
-    //   chain_id: 5,         // Goerli's chain id
-    //   gas: 5500000,        // Gas limit used for deploys.
-    //   confirmations: 2,    // # of confirmations to wait between deployments. (default: 0)
-    //   timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-    //   skipDryRun: true     // Skip dry run before migrations? (default: false for public nets)
-    // },
+    goerli: {
+      provider: () => new HDWalletProvider(mnemonic, `https://goerli.infura.io/v3/${infuraProjectId}`,AccountIndex),
+      network_id: 5,       // Goerli's network id
+      // chain_id: 5,         // Goerli's chain id
+      gas: 5500000,        // Gas limit used for deploys.
+      // confirmations: 2,    // # of confirmations to wait between deployments. (default: 0)
+      // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets)
+    },
+    ropsten:{
+      provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${ropstenProjectId}`,AccountIndex),
+      network_id: 3,       // Goerli's network id
+      // chain_id: 5,         // Goerli's chain id
+      gas: 5500000,        // Gas limit used for deploys.
+      // confirmations: 2,    // # of confirmations to wait between deployments. (default: 0)
+      // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets)
+    },
     //
     // Useful for private networks
-    // private: {
-    //   provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
-    //   network_id: 2111,   // This network is yours, in the cloud.
-    //   production: true    // Treats this network as if it was a public net. (default: false)
-    // }
+    ganache_local: {
+      provider: () => new HDWalletProvider(mnemonic, `http://127.0.0.1:7545`,AccountIndex),
+      network_id: 5777,   // This network is yours, in the cloud.
+      production: false   // Treats this network as if it was a public net. (default: false)
+    }
   },
 
   // Set default mocha options here, use special reporters, etc.

@@ -5,6 +5,7 @@ const VaccCenter=()=>{
     const { state: { accounts,contract,vaccines} } = useEth();
     const [selectedVaccine,setSelectedVaccine]=useState(0);  
     const [endedVaccines,setEndedVaccines]=useState([]);
+    const [loader,showloader]=useState(false);
     
     useEffect(()=>{
      let _ended= vaccines?.filter(vacc=>(vacc.state=="3"));
@@ -18,6 +19,7 @@ const VaccCenter=()=>{
   }
   const receiveContainer=async()=>{
     try{
+      showloader(true)
       const received=await contract?.methods?.ReceiveContainer(selectedVaccine)?.send({from:accounts[0]})
       if(received){
         const _ended=vaccines?.filter(vacc=>(vacc.state=="3" && vacc.id!=selectedVaccine));
@@ -30,13 +32,16 @@ const VaccCenter=()=>{
     catch(err){
       console.log(err)
     }
+    finally{
+      showloader(false)
+    }
   }
  
  
     
 return <RootContainer heading={"Vaccination Center"} selectedVaccine={selectedVaccine} address={accounts && accounts[0]}> 
            <SelectComp vaccines={endedVaccines} selectedVaccine={selectedVaccine} handleSelect={handleSelect} />
-           <ButtonComp text={"Container Received"} onClick={receiveContainer}/> 
+           <ButtonComp disabled={loader} loader={loader} text={"Container Received"} onClick={receiveContainer}/> 
        </RootContainer>
   
 }

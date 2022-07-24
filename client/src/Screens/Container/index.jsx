@@ -6,6 +6,7 @@ const Container=()=>{
     const { state: { accounts,contract,vaccines} } = useEth();
     const [selectedVaccine,setSelectedVaccine]=useState(0);  
     const [startedVaccines,setStartedVaccines]=useState([]);
+    const [loader,showloader]=useState(false);
     
     useEffect(()=>{
      let _selected= vaccines?.filter(vacc=>(vacc.state=="2"));
@@ -19,6 +20,7 @@ const Container=()=>{
   }
   const handleViolation=async(type, val)=>{
     try{
+      showloader(true)
       const violated=await contract?.methods?.violationOccurrence(selectedVaccine,type,val)?.send({from:accounts[0]})
       if(violated){
         const _violate=vaccines?.filter(vacc=>(( vacc.state=="2") && vacc.id!=selectedVaccine));
@@ -31,6 +33,9 @@ const Container=()=>{
     }
     catch(err){
       console.log(err)
+    }
+    finally{
+      showloader(false)
     }
   }
  
@@ -55,7 +60,7 @@ const Container=()=>{
 return <RootContainer heading={"Container"} address={accounts && accounts[0]}> 
            <SelectComp vaccines={startedVaccines} selectedVaccine={selectedVaccine} handleSelect={handleSelect} />
            {BUTTONS.map(btn=>{
-           return <ButtonComp text={btn.text} onClick={()=>handleViolation(btn.type,12)}/>})}
+           return <ButtonComp disabled={loader} loader={loader}  text={btn.text} onClick={()=>handleViolation(btn.type,12)}/>})}
   </RootContainer>
 }
 export default Container;
