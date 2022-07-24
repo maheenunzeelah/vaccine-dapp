@@ -1,40 +1,25 @@
-# React Truffle Box
+For learning, I have developed an Ethereum Dapp based on “Blockchain-Based Solution for Distribution and Delivery of COVID-19 Vaccines” research paper written by by Ahmad Musamih, Raja Jayaraman, Khaled Salah, Haya R Hasan, Ibrar Yaqoob, Yousof Al-Hammadi.
+They also provided smart contract, written in solidity, for public use, so I changed it a little bit and used it for developing Dapp.
 
-This box comes with everything you need to start using Truffle to write, compile, test, and deploy smart contracts, and interact with them from a React app.
+Overview:
+-  There are four roles, manufacturer, distributor, container and vaccination center. Roles' permissions are managed by solidity modifiers.
+-  Manufacturer can create containers and add distributor.
+-  Distributor can start and end delivery of containers.
+-  Container can call violation events like rise in temperature, exposure to light etc.
+-   Vaccination center can receive containers.
+-   Based on these transactions events will be triggered. Anyone can track the current status of the container.
 
-## Installation
+Features I added:
+-  In original contract only one vaccine container could be tracked but I added option to track multiple containers.
+-  Restructured code and divided it into multiple contracts.
+-  Tweaked vaccine container events and violation events.
 
-First ensure you are in an empty directory.
+For development:
+-  Ganache is used as local blockchain.
+-   Dapp is create by truffle react box.
+-   Metamask wallet is used for account and private keys.
+-   React Material UI for user interface.
 
-Run the `unbox` command using 1 of 2 ways.
-
-```sh
-# Install Truffle globally and run `truffle unbox`
-$ npm install -g truffle
-$ truffle unbox react
-```
-
-```sh
-# Alternatively, run `truffle unbox` via npx
-$ npx truffle unbox react
-```
-
-Start the react dev server.
-
-```sh
-$ cd client
-$ npm start
-  Starting the development server...
-```
-
-From there, follow the instructions on the hosted React app. It will walk you through using Truffle and Ganache to deploy the `SimpleStorage` contract, making calls to it, and sending transactions to change the contract's state.
-
-## FAQ
-
-- __How do I use this with Ganache (or any other network)?__
-
-  The Truffle project is set to deploy to Ganache by default. If you'd like to change this, it's as easy as modifying the Truffle config file! Check out [our documentation on adding network configurations](https://trufflesuite.com/docs/truffle/reference/configuration/#networks). From there, you can run `truffle migrate` pointed to another network, restart the React dev server, and see the change take place.
-
-- __Where can I find more resources?__
-
-  This Box is a sweet combo of [Truffle](https://trufflesuite.com) and [Create React App](https://create-react-app.dev). Either one would be a great place to start!
+Github link for original smart contract:
+https://lnkd.in/dRNP8_uc
+Research paper can be found on IEEE Xplore.
